@@ -113,6 +113,28 @@ const calculateSize = (folder: Folder): number => {
 
 calculateSize(files);
 
+const printFolder = (folder: Folder, depth: number) => {
+  const indent = '  '.repeat(depth);
+  Object.entries(folder.files).forEach(([name, file]) => {
+    if (file.type === 'file') {
+      console.log(`${indent}- ${name} (file, size=${file.size})`);
+    } else {
+      console.log(`${indent}- ${name} (dir, size=${file.size})`);
+      printFolder(file, depth + 1);
+    }
+  });
+};
+
+printFolder(
+  {
+    type: 'folder',
+    files: {
+      '/': files,
+    },
+  },
+  0
+);
+
 // console.log(JSON.stringify(files, null, 2));
 
 // now we go through the folders and find the folders that are smaller than 100000
