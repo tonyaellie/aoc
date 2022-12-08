@@ -3,49 +3,23 @@ export const x = '';
 const input = await Deno.readTextFile('./input.txt');
 
 // mapping
-const opponent = {
-  A: 1, // rock
-  B: 2, // paper
-  C: 3, // scissors
-};
-const scoreMap = {
-  X: 0, // lose
-  Y: 3, // draw
-  Z: 6, // win
-};
+const score = {
+  'A X': 3, // rock, lose
+  'A Y': 4, // rock, draw
+  'A Z': 8, // rock, win
+  'B X': 1, // paper, lose
+  'B Y': 5, // paper, draw
+  'B Z': 9, // paper, win
+  'C X': 2, // scissors, lose
+  'C Y': 6, // scissors, draw
+  'C Z': 7, // scissors, win
+} as any;
 
 // split input into lines
 const lines = input.split(/\r?\n/);
 
 // map array to score for each round
-const scores = lines.map((line) => {
-  const [opponentMove, win] = line.split(' ') as [
-    'A' | 'B' | 'C',
-    'X' | 'Y' | 'Z'
-  ];
-  let score = 0;
-  // add score
-  score += scoreMap[win];
-  if (win === 'Y') {
-    // if draw add score for selected move
-    score += opponent[opponentMove];
-  } else if (win === 'Z') {
-    // if win add score for selected move
-    let tmpScore = opponent[opponentMove] + 1;
-    if (tmpScore > 3) {
-      tmpScore = 1;
-    }
-    score += tmpScore;
-  } else {
-    // if lose add score for selected move
-    let tmpScore = opponent[opponentMove] - 1;
-    if (tmpScore < 1) {
-      tmpScore = 3;
-    }
-    score += tmpScore;
-  }
-  return score;
-});
+const scores = lines.map((line) => score[line]);
 
 // sum scores
 const totalScore = scores.reduce((a, b) => a + b, 0);
