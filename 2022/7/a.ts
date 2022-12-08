@@ -32,7 +32,7 @@ const files: Folder = {
 commands.forEach((inp) => {
   // split inp by line
   const [commandWithParams, ...response] = inp
-    .split('\n')
+    .split(/\r?\n/)
     .filter((text) => text !== '');
   if (!commandWithParams) return;
   // console.log(commandWithParams);

@@ -4,7 +4,7 @@ const input = await Deno.readTextFile('./input.txt');
 
 // convert the input grid to a 2d array
 const grid: number[][] = input
-  .split('\n')
+  .split(/\r?\n/)
   .map((row) => row.split('').map((char) => parseInt(char, 10)));
 
 // map the grid to a true/false array of whether the cell is a tree visible from the outside

@@ -15,7 +15,7 @@ const scoreMap = {
 };
 
 // split input into lines
-const lines = input.split('\n');
+const lines = input.split(/\r?\n/);
 
 // map array to score for each round
 const scores = lines.map((line) => {
