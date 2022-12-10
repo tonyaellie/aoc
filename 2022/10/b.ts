@@ -9,7 +9,7 @@ let accumulator = 1;
 let cycle = 0;
 
 // create a 40 by 6 grid
-const grid = Array.from(Array(6), (e) => Array.from(Array(40), (e) => '.'));
+const grid = Array.from(Array(6), (e) => Array.from(Array(40), (e) => ' '));
 
 const printGrid = (grid: string[][]) => {
   grid.forEach((row) => {
@@ -28,7 +28,7 @@ const execCycle = () => {
     col === accumulator - 1 ||
     col === accumulator + 1
   ) {
-    grid[row][col] = '#';
+    grid[row][col] = '█';
   }
   cycle++;
 };
