@@ -22,14 +22,10 @@ const width = 600;
 // find max y
 const maxY = lines.reduce((acc, line) => {
   const lineParts = line.split(' -> ');
-  const lineCoords = lineParts.map((linePart) => {
-    // split line ','
-    const [xTmp, yTmp] = linePart.split(',');
-    const x = Number(xTmp);
-    const y = Number(yTmp);
-    return { x, y };
-  });
-  const maxY = lineCoords.reduce((acc, { y }) => {
+  const lineCoords = lineParts.map((linePart) =>
+    Number(linePart.split(',')[1])
+  );
+  const maxY = lineCoords.reduce((acc, y) => {
     return Math.max(acc, y);
   }, 0);
   return Math.max(acc, maxY);
@@ -39,9 +35,6 @@ const maxY = lines.reduce((acc, line) => {
 const grid = Array.from({ length: maxY + 3 }, () =>
   Array.from({ length: width }, () => '.')
 );
-
-// make bottom row rock
-grid[grid.length - 1] = grid[grid.length - 1].map(() => '#');
 
 const getPos = (x: number, y: number) => {
   return grid[y][x];
@@ -56,7 +49,15 @@ setPos(500 - shift, 0, '+');
 
 const printGrid = (grid: string[][]) => {
   grid.forEach((row) => {
-    console.log(row.join(''));
+    // color yellow if o
+    // color blue if #
+    console.log(
+      row
+        .map((x) =>
+          x === 'o' ? '\x1b[33mo\x1b[0m' : x === '#' ? '\x1b[34m#\x1b[0m' : x
+        )
+        .join('')
+    );
   });
 };
 
@@ -103,16 +104,16 @@ const spawnSand = () => {
   // if we settle then set the sand to o
   let settled = false;
   while (!settled) {
+    // if y > maxY then we are in the void
+    if (sandPos.y > maxY) {
+      return true;
+    }
     if (getPos(sandPos.x, sandPos.y + 1) !== '.') {
       // if we can't go down, try left and right
       if (getPos(sandPos.x - 1, sandPos.y + 1) !== '.') {
         if (getPos(sandPos.x + 1, sandPos.y + 1) !== '.') {
           setPos(sandPos.x, sandPos.y, 'o');
           // we are settled
-          // if x: 100 and y: 0
-          if (sandPos.x === 500 - shift && sandPos.y === 0) {
-            return true;
-          }
           settled = true;
         } else {
           // go right
