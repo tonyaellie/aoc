@@ -26,32 +26,32 @@ const visited: {
   y: number;
 }[] = [];
 
-const calcPoint = (h: Point, t: Point) => {
+const calcPoint = (head: Point, tail: Point) => {
   // now if the tail is not within one step of the head
   // move the tail one step in the direction
 
   // if the head is directly above the tail
-  if (h.y - t.y > 1 && h.x - t.x === 0) {
+  if (head.y - tail.y > 1 && head.x - tail.x === 0) {
     // move the tail up
-    t.y++;
+    tail.y++;
   }
 
   // if the head is directly below the tail
-  if (h.y - t.y < -1 && h.x - t.x === 0) {
+  if (head.y - tail.y < -1 && head.x - tail.x === 0) {
     // move the tail down
-    t.y--;
+    tail.y--;
   }
 
   // if the head is directly to the right of the tail
-  if (h.x - t.x > 1 && h.y - t.y === 0) {
+  if (head.x - tail.x > 1 && head.y - tail.y === 0) {
     // move the tail right
-    t.x++;
+    tail.x++;
   }
 
   // if the head is directly to the left of the tail
-  if (h.x - t.x < -1 && h.y - t.y === 0) {
+  if (head.x - tail.x < -1 && head.y - tail.y === 0) {
     // move the tail left
-    t.x--;
+    tail.x--;
   }
 
   // these === don't work because the head and tail are not always
@@ -61,45 +61,45 @@ const calcPoint = (h: Point, t: Point) => {
   // up 2 and right 1 or up 1 and right 2
   // move the tail up and right
   if (
-    (h.y - t.y === 2 && h.x - t.x === 1) ||
-    (h.y - t.y === 1 && h.x - t.x === 2) ||
-    (h.y - t.y === 2 && h.x - t.x === 2)
+    (head.y - tail.y === 2 && head.x - tail.x === 1) ||
+    (head.y - tail.y === 1 && head.x - tail.x === 2) ||
+    (head.y - tail.y === 2 && head.x - tail.x === 2)
   ) {
-    t.y++;
-    t.x++;
+    tail.y++;
+    tail.x++;
   }
   // up 2 and left 1 or up 1 and left 2
   // move the tail up and left
   if (
-    (h.y - t.y === 2 && h.x - t.x === -1) ||
-    (h.y - t.y === 1 && h.x - t.x === -2) ||
-    (h.y - t.y === 2 && h.x - t.x === -2)
+    (head.y - tail.y === 2 && head.x - tail.x === -1) ||
+    (head.y - tail.y === 1 && head.x - tail.x === -2) ||
+    (head.y - tail.y === 2 && head.x - tail.x === -2)
   ) {
-    t.y++;
-    t.x--;
+    tail.y++;
+    tail.x--;
   }
   // down 2 and right 1 or down 1 and right 2
   // move the tail down and right
   if (
-    (h.y - t.y === -2 && h.x - t.x === 1) ||
-    (h.y - t.y === -1 && h.x - t.x === 2) ||
-    (h.y - t.y === -2 && h.x - t.x === 2)
+    (head.y - tail.y === -2 && head.x - tail.x === 1) ||
+    (head.y - tail.y === -1 && head.x - tail.x === 2) ||
+    (head.y - tail.y === -2 && head.x - tail.x === 2)
   ) {
-    t.y--;
-    t.x++;
+    tail.y--;
+    tail.x++;
   }
   // down 2 and left 1 or down 1 and left 2
   // move the tail down and left
   if (
-    (h.y - t.y === -2 && h.x - t.x === -1) ||
-    (h.y - t.y === -1 && h.x - t.x === -2) ||
-    (h.y - t.y === -2 && h.x - t.x === -2)
+    (head.y - tail.y === -2 && head.x - tail.x === -1) ||
+    (head.y - tail.y === -1 && head.x - tail.x === -2) ||
+    (head.y - tail.y === -2 && head.x - tail.x === -2)
   ) {
-    t.y--;
-    t.x--;
+    tail.y--;
+    tail.x--;
   }
 
-  return t;
+  return tail;
 };
 
 // split input by line
@@ -127,15 +127,15 @@ instructions.forEach((instruction) => {
         break;
     }
 
-    rope.forEach((t, i) => {
+    rope.forEach((tail, i) => {
       // if i is 0 then we are at the head
-      if (t.name === 'H') return;
+      if (tail.name === 'H') return;
       // get the head
-      const h = rope[i - 1];
-      t = calcPoint(h, t);
+      const head = rope[i - 1];
+      tail = calcPoint(head, tail);
       // if name is T then add the point to the visited array
-      if (t.name === 'T') {
-        visited.push({ x: t.x, y: t.y });
+      if (tail.name === 'T') {
+        visited.push({ x: tail.x, y: tail.y });
       }
     });
   }
@@ -143,7 +143,7 @@ instructions.forEach((instruction) => {
 
 // remove duplicates from the visited array
 const unique = visited.filter(
-  (v, i, a) => a.findIndex((t) => t.x === v.x && t.y === v.y) === i
+  (v, i, a) => a.findIndex((tail) => tail.x === v.x && tail.y === v.y) === i
 );
 
 console.log(unique.length);
