@@ -8,48 +8,66 @@ const unparsed = input.split(/\r?\n/);
 // e.g.
 // Sensor at x=2, y=18: closest beacon is at x=-2, y=15
 
+const row = 2000000;
+
+const calculateManhattanDistance = (
+  a: { x: number; y: number },
+  b: { x: number; y: number }
+) => {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+};
+
 // get sensor position and closest beacon position
 const sensors = unparsed.map((line) => {
   const [sensor, beacon] = line.split(':').map((part) => {
     const [x, y] = part.match(/x=(-?\d+), y=(-?\d+)/)!.slice(1);
     return { x: parseInt(x), y: parseInt(y) };
   });
-  // radius is the distance between the sensor and the beacon
-  const radius = Math.abs(sensor.x - beacon.x) + Math.abs(sensor.y - beacon.y);
-  return { sensor, beacon, radius };
+  const distance = calculateManhattanDistance(sensor, beacon);
+  return { sensor, beacon, distance };
 });
 
-// get the biggest x and y values of sensor or beacon
-const max = sensors.reduce(
-  (max, { sensor, beacon }) => ({
-    x: Math.max(max.x, sensor.x, beacon.x),
-    y: Math.max(max.y, sensor.y, beacon.y),
-  }),
-  { x: 0, y: 0 }
-);
-
-// get the smallest x and y values of sensor or beacon
-const min = sensors.reduce(
-  (min, { sensor, beacon }) => ({
-    x: Math.min(min.x, sensor.x, beacon.x, beacon.x),
-    y: Math.min(min.y, sensor.y, beacon.y, beacon.y),
-  }),
-  { x: 0, y: 0 }
-);
-
-// create a grid of the size of the biggest x and y values
-const grid = Array.from({ length: max.y - min.y + 1 }, () =>
-  Array.from({ length: max.x - min.x + 1 }, () => '.')
-);
-
-// add sensors and beacons to the grid
-sensors.forEach(({ sensor, beacon, radius }) => {
-  grid[sensor.y - min.y][sensor.x - min.x] = 'S';
-  grid[beacon.y - min.y][beacon.x - min.x] = 'B';
-  // add the radius to the grid
-  for (let i = 0; i <= radius; i++) {
-    
+// find all sensors that are within range of y=2000000
+const inRange = sensors.filter(({ sensor, distance }) => {
+  return sensor.y + distance >= row && sensor.y - distance <= row;
 });
 
-// print the grid
-grid.forEach((row) => console.log(row.join('')));
+// find max x and y and min x and y
+const maxX = Math.max(
+  ...sensors.map(({ sensor, beacon }) => Math.max(sensor.x, beacon.x))
+);
+const minX = Math.min(
+  ...sensors.map(({ sensor, beacon }) => Math.min(sensor.x, beacon.x))
+);
+const maxRange = Math.max(...sensors.map(({ distance }) => distance));
+
+console.log(maxX + maxRange - (minX - maxRange));
+
+const rowArray: string[] = [];
+
+// for all locations in row 2000000 we check if there in range of any sensor
+for (let x = minX - maxRange; x <= maxX + maxRange; x++) {
+  if (
+    inRange.filter(({ sensor, distance }) => {
+      const distanceTo2 = calculateManhattanDistance(sensor, { x, y: row });
+      if (distanceTo2 <= distance) {
+        return true;
+      }
+    }).length > 0
+  ) {
+    rowArray.push('#');
+  } else {
+    rowArray.push('.');
+  }
+}
+
+// count number of beacons that are on row 2000000
+const beacons = sensors.filter(({ beacon }) => beacon.y === row);
+beacons.forEach(({ beacon }) => {
+  rowArray[beacon.x - minX + maxRange] = 'B';
+});
+
+// console.log(rowArray.join(''));
+
+// count number of # in rowArray
+console.log(rowArray.filter((char) => char === '#').length);
