@@ -47,12 +47,7 @@ const monkeys: Monkey[] = unparsedMonkeys.map((unparsedMonkey) => {
   };
 });
 
-// m is the multiple of the divisors
-const m = monkeys.reduce((acc, monkey) => {
-  return acc * monkey.test.divisor;
-}, 1);
-
-for (let i = 0; i < 10000; i++) {
+for (let i = 0; i < 20; i++) {
   monkeys.forEach((monkey) => {
     monkey.items.forEach((item) => {
       monkey.inspections++;
@@ -67,11 +62,11 @@ for (let i = 0; i < 10000; i++) {
         result = leftValue * rightValue;
       }
       // divide by 3 and floor
-      // const newResult = Math.floor(result / 3);
-      if (result % monkey.test.divisor === 0) {
-        monkeys[monkey.test.true].items.push(result % m);
+      const newResult = Math.floor(result / 3);
+      if (newResult % monkey.test.divisor === 0) {
+        monkeys[monkey.test.true].items.push(newResult);
       } else {
-        monkeys[monkey.test.false].items.push(result % m);
+        monkeys[monkey.test.false].items.push(newResult);
       }
     });
     monkey.items = [];
