@@ -5,9 +5,6 @@ const input = await Deno.readTextFile('./input.txt');
 // split by line
 const unparsed = input.split(/\r?\n/);
 
-// e.g.
-// Sensor at x=2, y=18: closest beacon is at x=-2, y=15
-
 const calculateManhattanDistance = (
   a: { x: number; y: number },
   b: { x: number; y: number }
@@ -25,28 +22,30 @@ const sensors = unparsed.map((line) => {
   return { sensor, beacon, distance };
 });
 
-console.time('a');
-for (let y = 0; y <= 4000000; y++) {
-  const inRange = sensors.filter(({ sensor, distance }) => {
-    return sensor.y + distance >= y && sensor.y - distance <= y;
-  });
-  // for all in range find the edges of the range
-  const edges = inRange.map(({ sensor, distance }) => {
-    // find the furthest left and right within range where it intersects the y
-    // distance is the max distance from the sensor
-    const distanceTo2 = calculateManhattanDistance(sensor, { x: 0, y });
-    const x = Math.sqrt(distance ** 2 - distanceTo2 ** 2);
-    return { left: sensor.x - x, right: sensor.x + x };
-    // not sure if this is correct
-  });
+const outOfRange = (x: number, y: number) =>
+  sensors.every(
+    ({ sensor, distance }) =>
+      Math.abs(sensor.x - x) + Math.abs(sensor.y - y) > distance
+  );
 
-  // find if there is a gap between the edges
-  
-  // if there is a gap log it
-
-  // check if y % 1000 === 0
-  if (y % 1000 === 0) {
-    console.log(y);
+for (const { sensor, distance } of sensors) {
+  for (const xSector of [-1, 1]) {
+    for (const ySector of [-1, 1]) {
+      for (let distX = 0; distX <= distance + 1; distX++) {
+        const dy = distance + 1 - distX;
+        const x = sensor.x + distX * xSector;
+        const y = sensor.y + dy * ySector;
+        if (
+          x >= 0 &&
+          y >= 0 &&
+          x <= 4000000 &&
+          y <= 4000000 &&
+          outOfRange(x, y)
+        ) {
+          console.log(x * 4000000 + y);
+          Deno.exit();
+        }
+      }
+    }
   }
 }
-console.timeEnd('a');

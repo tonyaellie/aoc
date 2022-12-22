@@ -32,42 +32,22 @@ const inRange = sensors.filter(({ sensor, distance }) => {
   return sensor.y + distance >= row && sensor.y - distance <= row;
 });
 
-// find max x and y and min x and y
-const maxX = Math.max(
-  ...sensors.map(({ sensor, beacon }) => Math.max(sensor.x, beacon.x))
-);
-const minX = Math.min(
-  ...sensors.map(({ sensor, beacon }) => Math.min(sensor.x, beacon.x))
-);
-const maxRange = Math.max(...sensors.map(({ distance }) => distance));
+let count = 0;
 
-console.log(maxX + maxRange - (minX - maxRange));
+const seenXs = new Set();
+inRange.forEach(({ sensor, beacon, distance }) => {
+  if (sensor.y === row) seenXs.add(sensor.x);
+  if (beacon.y === row) seenXs.add(beacon.x);
 
-const rowArray: string[] = [];
-
-// for all locations in row 2000000 we check if there in range of any sensor
-for (let x = minX - maxRange; x <= maxX + maxRange; x++) {
-  if (
-    inRange.filter(({ sensor, distance }) => {
-      const distanceTo2 = calculateManhattanDistance(sensor, { x, y: row });
-      if (distanceTo2 <= distance) {
-        return true;
-      }
-    }).length > 0
-  ) {
-    rowArray.push('#');
-  } else {
-    rowArray.push('.');
+  for (let x = sensor.x - distance; x <= sensor.x + distance; x++) {
+    if (
+      !seenXs.has(x) &&
+      Math.abs(sensor.x - x) + Math.abs(sensor.y - row) <= distance
+    ) {
+      seenXs.add(x);
+      count++;
+    }
   }
-}
-
-// count number of beacons that are on row 2000000
-const beacons = sensors.filter(({ beacon }) => beacon.y === row);
-beacons.forEach(({ beacon }) => {
-  rowArray[beacon.x - minX + maxRange] = 'B';
 });
 
-// console.log(rowArray.join(''));
-
-// count number of # in rowArray
-console.log(rowArray.filter((char) => char === '#').length);
+console.log(count);
